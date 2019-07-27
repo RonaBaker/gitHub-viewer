@@ -1,48 +1,83 @@
 let searchContainer = document.querySelector('#search-container');
 let resultContainer = document.querySelector('#search-result-container');
-let searchInput = document.querySelector('#user-input');
-let userContainer = document.querySelector('#user-container');
+let searchInput = document.querySelector('#search-user-input');
+
+let userName = document.querySelector('#user-name');
+let userPic = document.querySelector('#user-pic');
+let repositoriesContainer = document.querySelector('#repositories-list');
+
 let resultLength = 0;
 
 function searchUsers(){
-    fetch('https://api.github.com/search/users?q=' + searchInput.value)
+    fetch(`https://api.github.com/search/users?q=${searchInput.value}`)
     .then(res => res.json())
     .then(data => {
-        create(data);
+        console.log(data);
+        createUsers(data);
     })
     .catch(error => console.log(error));
 }
 
-function create(data){
+function createUsers(data){
     resultLength = data.items.length;
-    for (let i=0; i<resultLength; i++){
-        const user = document.createElement("li");
-        const username = document.createElement("div");
-        const userPic = document.createElement("img");
-        const userRepBtn = document.createElement("button");
-        const userProfileBtn = document.createElement("button");
+    for (let i = 0; i < resultLength; i++) {
+        let user = document.createElement("div");
+        let userPicContainer = document.createElement("div");
+        let userPic = document.createElement("img");
+        let userDetails = document.createElement("div");
+        let userRepBtn = document.createElement("button");
+        let userProfileBtn = document.createElement("button");
+
+        user.classList.add("user");
+        userPicContainer.classList.add("user-picture");
+        userDetails.classList.add("user-details");
 
         userRepBtn.innerHTML = "Repositories";
         userProfileBtn.innerHTML = "Full profile";
 
-        userRepBtn.addEventListener("click", showRep);
-        userRepBtn.dataItem = data.items[i];
+        userRepBtn.addEventListener("click", showRepositories);
+        //userProfileBtn.addEventListener("click", showProfile);
+
+        userRepBtn.dataItem = data.items[i]; // Match specific item for eventListener
+        //userProfileBtn.dataItem = data.items[i];
+
+        userPic.setAttribute("src" , data.items[i].avatar_url);
+
+        userDetails.innerHTML = data.items[i].login;
 
         resultContainer.appendChild(user);
-        user.appendChild(username);
-        user.appendChild(userPic);
-        user.appendChild(userRepBtn);
-        user.appendChild(userProfileBtn);
-        userPic.setAttribute("src" , data.items[i].avatar_url);
-        username.innerHTML = data.items[i].login;
+        user.appendChild(userDetails);
+        user.appendChild(userPicContainer);
+        userPicContainer.appendChild(userPic);
+        userDetails.appendChild(userRepBtn);
+        userDetails.appendChild(userProfileBtn);   
     }
 }
 
-function showRep(event){
-    console.log(event);
+function showRepositories(event){
     const dataItem = event.target.dataItem;
-    let repositories = document.createElement("div");
-    repositories.innerHTML = dataItem.repos_url;
-    userContainer.appendChild(repositories);
+    console.log(dataItem);
+    
+    fetch(`https://api.github.com/users/${dataItem.login}/repos`)
+    .then(res => res.json())
+    .then(data => {
+        createUserRepositories(data)
+    })
+    .catch(error => console.log(error));
 
 }
+
+function createUserRepositories(data){
+    for(let i = 0; i < data.length; i++){
+        let repository = document.createElement("div");
+        repository.innerHTML = data[i].name;
+        console.log(data);
+        userName.innerHTML = data[i].owner.login;
+        userName.innerHTML += `(${data.length})`;
+        userPic.setAttribute("src" , data[i].owner.avatar_url);
+    
+        repositoriesContainer.appendChild(repository);
+    }
+}
+
+

@@ -9,11 +9,19 @@
     <body>
         <h1>GitHub Viewer</h1>
         <div id="search-container">
-            <input id="user-input"  name="user-input" type="text" autocomplete="off">
-            <input  id="btnSearch" type="button" onclick="searchUsers()" value="search">
+            <input class="search-user" id="search-user-input"  name="search-user-input" type="text" autocomplete="off">
+            <input class="search-user" id="search-user-button" type="button" onclick="searchUsers()" value="search">
             <div id="search-result-container"></div>
         </div>
+
         <div id="user-container"></div>
+        <div id="user-repositories-container">
+            <div id="repositories-header">
+                <img id="user-pic">
+                <h2 id="user-name"></h2>
+            </div>
+            <div id="repositories-list"></div>
+        </div>
         <script src="github.js"></script>
     </body>
 </html>
